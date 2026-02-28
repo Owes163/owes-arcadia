@@ -2,130 +2,138 @@ import clsx from "clsx";
 import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState } from "react";
-import { TiLocationArrow } from "react-icons/ti";
-import { Link, useNavigate } from "react-router-dom";
-
-import Button from "../ui/Button";
+import { Link } from "react-router-dom";
+import { FiSearch, FiUser } from "react-icons/fi";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 const navItems = [
   { name: "Home", path: "/" },
+  { name: "Games", path: "/games" },
+  { name: "Worlds", path: "/" },
   { name: "Vault", path: "/" },
-  { name: "Game", path: "/games" }, // 👈 Games Page
+  { name: "Roadmap", path: "/" },
   { name: "About", path: "/" },
-  { name: "Contact", path: "/contact" },
 ];
 
 const NavBar = ({ cartCount }) => {
-  const [isAudioPlaying, setIsAudioPlaying] = useState(true);
-  const [isIndicatorActive, setIsIndicatorActive] = useState(true);
+  const navRef = useRef(null);
+  const audioRef = useRef(null);
 
-  const audioElementRef = useRef(null);
-  const navContainerRef = useRef(null);
+  const { y } = useWindowScroll();
 
-  const { y: currentScrollY } = useWindowScroll();
-  const [isNavVisible, setIsNavVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [lastScroll, setLastScroll] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  const toggleAudioIndicator = () => {
-    setIsAudioPlaying((prev) => !prev);
-    setIsIndicatorActive((prev) => !prev);
-  };
-
+  // Scroll behaviour
   useEffect(() => {
-    if (isAudioPlaying) {
-      audioElementRef.current?.play();
+    setScrolled(y > 20);
+
+    if (y > lastScroll) {
+      setVisible(false);
     } else {
-      audioElementRef.current?.pause();
-    }
-  }, [isAudioPlaying]);
-
-  useEffect(() => {
-    if (currentScrollY === 0) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.remove("floating-nav");
-    } else if (currentScrollY > lastScrollY) {
-      setIsNavVisible(false);
-      navContainerRef.current.classList.add("floating-nav");
-    } else if (currentScrollY < lastScrollY) {
-      setIsNavVisible(true);
-      navContainerRef.current.classList.add("floating-nav");
+      setVisible(true);
     }
 
-    setLastScrollY(currentScrollY);
-  }, [currentScrollY, lastScrollY]);
+    setLastScroll(y);
+  }, [y]);
 
+  // GSAP animation
   useEffect(() => {
-    gsap.to(navContainerRef.current, {
-      y: isNavVisible ? 0 : -100,
-      opacity: isNavVisible ? 1 : 0,
-      duration: 0.2,
+    gsap.to(navRef.current, {
+      y: visible ? 0 : -120,
+      opacity: visible ? 1 : 0,
+      duration: 0.3,
     });
-  }, [isNavVisible]);
+  }, [visible]);
+
+  // Audio toggle
+  useEffect(() => {
+    if (isPlaying) {
+      audioRef.current?.play().catch(() => {});
+    } else {
+      audioRef.current?.pause();
+    }
+  }, [isPlaying]);
 
   return (
     <div
-      ref={navContainerRef}
-      className="fixed inset-x-0 top-4 z-50 h-16 transition-all duration-700 sm:inset-x-6"
+      ref={navRef}
+      className={clsx(
+        "fixed top-4 inset-x-6 z-50 transition-all duration-500",
+        {
+          "bg-black/60 backdrop-blur-xl rounded-xl shadow-lg":
+            scrolled,
+        }
+      )}
     >
-      <header className="absolute top-1/2 w-full -translate-y-1/2">
-        <nav className="flex size-full items-center justify-between p-4">
+      <nav className="flex items-center justify-between h-16 px-8">
 
-          {/* Logo */}
-          <div className="flex items-center gap-7">
-            <Link to="/">
-              <img src="/img/logo.png" alt="logo" className="w-10" />
-            </Link>
+        {/* LEFT - Logo */}
+        <Link to="/" className="text-2xl font-bold text-white tracking-wider">
+          OWES ARCADIA
+        </Link>
 
-            <Button
-              title="Products"
-              rightIcon={<TiLocationArrow />}
-              containerClass="bg-blue-50 md:flex hidden items-center justify-center gap-1"
-            />
-          </div>
-
-          {/* Nav Links */}
-          <div className="flex items-center">
-            <div className="hidden md:block">
-              {navItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className="nav-hover-btn"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* Cart Link */}
-            <Link to="/cart" className="ml-6 text-white">
-              Cart ({cartCount || 0})
-            </Link>
-
-            {/* Audio Button */}
-            <button
-              onClick={toggleAudioIndicator}
-              className="ml-10 flex items-center space-x-0.5"
+        {/* CENTER - Nav Links */}
+        <div className="hidden md:flex items-center gap-8">
+          {navItems.map((item, index) => (
+            <Link
+              key={index}
+              to={item.path}
+              className="relative text-white font-medium group"
             >
-              <audio
-                ref={audioElementRef}
-                className="hidden"
-                src="/audio/loop.mp3"
-                loop
-              />
-              {[1, 2, 3, 4].map((bar) => (
+              {item.name}
+              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-purple-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
+          ))}
+        </div>
+
+        {/* RIGHT - Icons + Music */}
+        <div className="flex items-center gap-6 text-white">
+
+          <FiSearch className="cursor-pointer hover:text-purple-400 transition-colors" />
+
+          <Link to="/cart" className="relative">
+            <AiOutlineShoppingCart className="text-xl hover:text-purple-400 transition-colors" />
+            <span className="absolute -top-2 -right-3 bg-purple-600 text-xs px-2 py-0.5 rounded-full">
+              {cartCount || 0}
+            </span>
+          </Link>
+
+          <FiUser className="cursor-pointer hover:text-purple-400 transition-colors" />
+
+          {/* 🎵 MUSIC BUTTON */}
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
+          >
+            <audio
+              ref={audioRef}
+              className="hidden"
+              src="/audio/loop.mp3"
+              loop
+            />
+
+            <span className="text-sm font-semibold tracking-wide">
+              {isPlaying ? "Music On" : "Music Off"}
+            </span>
+
+            <div className="flex items-end gap-[2px]">
+              {[1, 2, 3].map((bar) => (
                 <div
                   key={bar}
-                  className={clsx("indicator-line", {
-                    active: isIndicatorActive,
-                  })}
-                  style={{ animationDelay: `${bar * 0.1}s` }}
+                  className={clsx(
+                    "w-[3px] bg-purple-500 transition-all duration-300",
+                    isPlaying ? "h-4 animate-pulse" : "h-2"
+                  )}
                 />
               ))}
-            </button>
-          </div>
-        </nav>
-      </header>
+            </div>
+          </button>
+
+        </div>
+      </nav>
     </div>
   );
 };

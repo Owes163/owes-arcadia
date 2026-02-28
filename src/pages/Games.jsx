@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import games from "../data/games";
-import GameCard from "../components/GameCard";
+import GameCard from "../components/ui/GameCard";
 import gsap from "gsap";
 
 function Games({ addToCart }) {

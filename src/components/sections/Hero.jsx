@@ -12,12 +12,13 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
   const [hasClicked, setHasClicked] = useState(false);
-
   const [loading, setLoading] = useState(true);
   const [loadedVideos, setLoadedVideos] = useState(0);
 
   const totalVideos = 4;
+
   const nextVdRef = useRef(null);
+  const heroContainerRef = useRef(null);
 
   const handleVideoLoad = () => {
     setLoadedVideos((prev) => prev + 1);
@@ -31,14 +32,15 @@ const Hero = () => {
 
   const handleMiniVdClick = () => {
     setHasClicked(true);
-
     setCurrentIndex((prevIndex) => (prevIndex % totalVideos) + 1);
   };
-  //  handle the video fade in animation on clicking
+
+  // 🎬 Video click transition
   useGSAP(
     () => {
       if (hasClicked) {
         gsap.set("#next-video", { visibility: "visible" });
+
         gsap.to("#next-video", {
           transformOrigin: "center center",
           scale: 1,
@@ -48,6 +50,7 @@ const Hero = () => {
           ease: "power1.inOut",
           onStart: () => nextVdRef.current.play(),
         });
+
         gsap.from("#current-video", {
           transformOrigin: "center center",
           scale: 0,
@@ -61,12 +64,14 @@ const Hero = () => {
       revertOnUpdate: true,
     }
   );
-  // will handle the video scroll rotate and skew animation
+
+  // 🎥 Scroll clip animation
   useGSAP(() => {
     gsap.set("#video-frame", {
       clipPath: "polygon(14% 0, 72% 0, 88% 90%, 0 95%)",
       borderRadius: "0% 0% 40% 10%",
     });
+
     gsap.from("#video-frame", {
       clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       borderRadius: "0% 0% 0% 0%",
@@ -80,12 +85,37 @@ const Hero = () => {
     });
   });
 
+  // 🎮 Mouse Parallax Effect
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const { clientX, clientY } = e;
+
+      const x = (clientX - window.innerWidth / 2) / 40;
+      const y = (clientY - window.innerHeight / 2) / 40;
+
+      gsap.to(heroContainerRef.current, {
+        x: x,
+        y: y,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
   const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
 
   return (
-    <div className="relative h-dvh w-screen overflow-x-hidden">
+    <div
+      ref={heroContainerRef}
+      className="relative h-dvh w-screen overflow-x-hidden"
+    >
       {loading && (
-        // made to make a 3 dot loading animation
         <div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
           <div className="three-body">
             <div className="three-body__dot"></div>
@@ -94,7 +124,7 @@ const Hero = () => {
           </div>
         </div>
       )}
-      {/* handle the video part */}
+
       <div
         id="video-frame"
         className="relative z-10 h-dvh w-screen overflow-hidden rounded-lg bg-blue-75"
@@ -128,6 +158,7 @@ const Hero = () => {
             className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
             onLoadedData={handleVideoLoad}
           />
+
           <video
             src={getVideoSrc(
               currentIndex === totalVideos - 1 ? 1 : currentIndex
@@ -158,7 +189,7 @@ const Hero = () => {
               id="watch-trailer"
               title="Watch trailer"
               leftIcon={<TiLocationArrow />}
-              containerClass="bg-yellow-300 flex-center gap-1"
+              containerClass="bg-yellow-300 flex-center gap-1 hover:shadow-[0_0_25px_rgba(255,200,0,0.7)] transition-all duration-300"
             />
           </div>
         </div>

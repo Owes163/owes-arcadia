@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 
 // GSAP
 import gsap from "gsap";
+import ScrollProgress from "./components/ui/ScrollProgress";
 
 // Layout
 import Navbar from "./components/layout/Navbar";
@@ -79,13 +80,14 @@ function App() {
 
   return (
     <>
-      <Navbar cartCount={cart.length} />
+       <ScrollProgress />
 
-      {/* Page Transition Overlay */}
-      <div
-        ref={overlayRef}
-        className="fixed inset-0 bg-black z-50 translate-x-full pointer-events-none"
-      />
+    <Navbar cartCount={cart.length} />
+
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 bg-black z-50 translate-x-full pointer-events-none"
+    />
 
       {/* Animated Page Wrapper */}
       <div ref={pageRef}>
