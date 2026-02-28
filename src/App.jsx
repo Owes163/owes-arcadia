@@ -8,13 +8,15 @@ import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 
 // Layout
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import About from "./components/About";
-import Features from "./components/Features";
-import Story from "./components/Story";
-import Contact from "./components/Contact";
-import Footer from "./components/Footer";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+
+// Sections
+import Hero from "./components/sections/Hero";
+import About from "./components/sections/About";
+import Features from "./components/sections/Features";
+import Story from "./components/sections/Story";
+import Contact from "./components/sections/Contact";
 
 // Pages
 import Games from "./pages/Games";

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import { Link, useNavigate } from "react-router-dom";
 
-import Button from "./Button";
+import Button from "../ui/Button";
 
 const navItems = [
   { name: "Home", path: "/" },
