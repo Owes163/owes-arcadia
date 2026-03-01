@@ -1,4 +1,4 @@
-// React Router
+// Router
 import { Routes, Route, useLocation } from "react-router-dom";
 
 // React
@@ -26,75 +26,88 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
 import Gallery from "./pages/Gallery";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Wishlist from "./pages/Wishlist";
 
 function App() {
-
-  // 🛒 Cart State
+  // Global state
   const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
   const location = useLocation();
   const pageRef = useRef(null);
   const overlayRef = useRef(null);
 
-  // Add to Cart
-  const addToCart = (game) => setCart((prev) => [...prev, game]);
+  // Cart
+  const addToCart = (game) =>
+    setCart((prev) => [...prev, game]);
 
-  // Remove from Cart
   const removeFromCart = (index) =>
     setCart((prev) => prev.filter((_, i) => i !== index));
 
-  // 🎬 Clean Cinematic Page Transition
-  useEffect(() => {
+  // Wishlist
+  const addToWishlist = (game) => {
+    setWishlist((prev) => {
+      const exists = prev.find((item) => item.id === game.id);
+      return exists
+        ? prev.filter((item) => item.id !== game.id)
+        : [...prev, game];
+    });
+  };
 
+  const removeFromWishlist = (id) =>
+    setWishlist((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+
+  // Page transition
+  useEffect(() => {
     const tl = gsap.timeline();
 
     tl.to(pageRef.current, {
       scale: 0.96,
       opacity: 0,
       duration: 0.4,
-      ease: "power2.inOut",
     })
+      .fromTo(
+        overlayRef.current,
+        { x: "100%" },
+        { x: "0%", duration: 0.5 },
+        "-=0.2"
+      )
+      .set(pageRef.current, { scale: 1.04, opacity: 0 })
+      .to(pageRef.current, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.7,
+      })
+      .to(overlayRef.current, {
+        x: "-100%",
+        duration: 0.6,
+      });
 
-    .fromTo(
-      overlayRef.current,
-      { x: "100%" },
-      { x: "0%", duration: 0.5, ease: "power3.inOut" },
-      "-=0.2"
-    )
-
-    .set(pageRef.current, { scale: 1.04, opacity: 0 })
-
-    .to(pageRef.current, {
-      scale: 1,
-      opacity: 1,
-      duration: 0.7,
-      ease: "expo.out",
-    })
-
-    .to(overlayRef.current, {
-      x: "-100%",
-      duration: 0.6,
-      ease: "power3.inOut",
-    });
-
+    return () => tl.kill();
   }, [location]);
 
   return (
     <>
-       <ScrollProgress />
+      <ScrollProgress />
 
-    <Navbar cartCount={cart.length} />
+      <Navbar
+        cartCount={cart.length}
+        wishlistCount={wishlist.length}
+      />
 
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 bg-black z-50 translate-x-full pointer-events-none"
-    />
+      <div
+        ref={overlayRef}
+        className="fixed inset-0 bg-black z-50 translate-x-full pointer-events-none"
+      />
 
-      {/* Animated Page Wrapper */}
       <div ref={pageRef}>
-
         <Routes>
 
+          {/* Home */}
           <Route
             path="/"
             element={
@@ -109,16 +122,29 @@ function App() {
             }
           />
 
+          {/* Games */}
           <Route
             path="/games"
-            element={<Games addToCart={addToCart} />}
+            element={
+              <Games
+                addToCart={addToCart}
+                addToWishlist={addToWishlist}
+              />
+            }
           />
 
+          {/* Game Detail */}
           <Route
             path="/game/:id"
-            element={<GameDetail addToCart={addToCart} />}
+            element={
+              <GameDetail
+                addToCart={addToCart}
+                addToWishlist={addToWishlist}
+              />
+            }
           />
 
+          {/* Cart */}
           <Route
             path="/cart"
             element={
@@ -129,15 +155,26 @@ function App() {
             }
           />
 
-          <Route path="/checkout" element={<Checkout />} />
+          {/* Wishlist ✅ FIXED */}
+          <Route
+            path="/wishlist"
+            element={
+              <Wishlist
+                wishlist={wishlist}
+                removeFromWishlist={removeFromWishlist}
+                addToCart={addToCart}
+              />
+            }
+          />
 
-          {/* ✅ STEP 3 ADDED */}
+          {/* Other */}
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/success" element={<Success />} />
-          
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
         </Routes>
-
       </div>
     </>
   );

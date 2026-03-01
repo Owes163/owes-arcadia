@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiSearch, FiUser } from "react-icons/fi";
 import { AiOutlineShoppingCart } from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -13,9 +14,10 @@ const navItems = [
   { name: "About", path: "/" },
 ];
 
-const NavBar = ({ cartCount }) => {
+const NavBar = ({ cartCount = 0, wishlistCount = 0 }) => {
   const navRef = useRef(null);
   const audioRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const { y } = useWindowScroll();
 
@@ -23,8 +25,11 @@ const NavBar = ({ cartCount }) => {
   const [lastScroll, setLastScroll] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // Scroll behaviour
+  /* ==============================
+     Scroll Behaviour
+  ============================== */
   useEffect(() => {
     setScrolled(y > 20);
 
@@ -37,7 +42,9 @@ const NavBar = ({ cartCount }) => {
     setLastScroll(y);
   }, [y]);
 
-  // GSAP animation
+  /* ==============================
+     GSAP Navbar Animation
+  ============================== */
   useEffect(() => {
     gsap.to(navRef.current, {
       y: visible ? 0 : -120,
@@ -46,7 +53,9 @@ const NavBar = ({ cartCount }) => {
     });
   }, [visible]);
 
-  // Audio toggle
+  /* ==============================
+     Background Music Toggle
+  ============================== */
   useEffect(() => {
     if (isPlaying) {
       audioRef.current?.play().catch(() => {});
@@ -54,6 +63,24 @@ const NavBar = ({ cartCount }) => {
       audioRef.current?.pause();
     }
   }, [isPlaying]);
+
+  /* ==============================
+     Close dropdown on outside click
+  ============================== */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div
@@ -68,12 +95,15 @@ const NavBar = ({ cartCount }) => {
     >
       <nav className="flex items-center justify-between h-16 px-8">
 
-        {/* LEFT - Logo */}
-        <Link to="/" className="text-2xl font-bold text-white tracking-wider">
+        {/* ================= LEFT - LOGO ================= */}
+        <Link
+          to="/"
+          className="text-2xl font-bold text-white tracking-wider"
+        >
           OWES ARCADIA
         </Link>
 
-        {/* CENTER - Nav Links */}
+        {/* ================= CENTER - NAV LINKS ================= */}
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item, index) => (
             <Link
@@ -87,23 +117,66 @@ const NavBar = ({ cartCount }) => {
           ))}
         </div>
 
-        {/* RIGHT - Icons + Music */}
-        <div className="flex items-center gap-6 text-white">
+        {/* ================= RIGHT - ICONS ================= */}
+        <div className="flex items-center gap-6 text-white relative">
 
-          <FiSearch className="cursor-pointer hover:text-purple-400 transition-colors" />
+          {/* Search */}
+          <FiSearch className="cursor-pointer hover:text-purple-400 transition-colors text-xl" />
 
-          <Link to="/cart" className="relative">
-            <AiOutlineShoppingCart className="text-xl hover:text-purple-400 transition-colors" />
-            <span className="absolute -top-2 -right-3 bg-purple-600 text-xs px-2 py-0.5 rounded-full">
-              {cartCount || 0}
-            </span>
+          {/* Wishlist */}
+          <Link to="/wishlist" className="relative group">
+            <AiOutlineHeart className="text-xl hover:text-pink-500 transition-colors group-hover:scale-110 duration-300" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2 -right-3 bg-pink-600 text-xs px-2 py-0.5 rounded-full animate-pulse">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
 
-          <FiUser className="cursor-pointer hover:text-purple-400 transition-colors" />
+          {/* Cart */}
+          <Link to="/cart" className="relative group">
+            <AiOutlineShoppingCart className="text-xl hover:text-purple-400 transition-colors group-hover:scale-110 duration-300" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-3 bg-purple-600 text-xs px-2 py-0.5 rounded-full animate-pulse">
+                {cartCount}
+              </span>
+            )}
+          </Link>
 
-          {/* 🎵 MUSIC BUTTON */}
+          {/* ================= USER DROPDOWN ================= */}
+          <div className="relative" ref={dropdownRef}>
+            <FiUser
+              onClick={() =>
+                setShowUserMenu((prev) => !prev)
+              }
+              className="cursor-pointer text-xl hover:text-purple-400 transition-colors"
+            />
+
+            {showUserMenu && (
+              <div className="absolute right-0 mt-4 w-44 bg-black/95 backdrop-blur-xl border border-purple-600 rounded-lg shadow-lg overflow-hidden animate-fadeIn">
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 text-sm hover:bg-purple-600/30 transition"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="block px-4 py-3 text-sm hover:bg-purple-600/30 transition"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* ================= MUSIC BUTTON ================= */}
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() =>
+              setIsPlaying((prev) => !prev)
+            }
             className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
           >
             <audio
@@ -123,13 +196,14 @@ const NavBar = ({ cartCount }) => {
                   key={bar}
                   className={clsx(
                     "w-[3px] bg-purple-500 transition-all duration-300",
-                    isPlaying ? "h-4 animate-pulse" : "h-2"
+                    isPlaying
+                      ? "h-4 animate-pulse"
+                      : "h-2"
                   )}
                 />
               ))}
             </div>
           </button>
-
         </div>
       </nav>
     </div>

@@ -1,36 +1,45 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Checkout() {
-
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🛒 Receive full cart
+  /* ==============================
+     RECEIVE CART SAFELY
+  ============================== */
   const cart = location.state?.cart || [];
 
   const [loading, setLoading] = useState(false);
 
-  if (cart.length === 0) {
-    return (
-      <div className="min-h-screen bg-black text-white pt-32 px-16">
-        No Items To Checkout
-      </div>
-    );
-  }
+  /* ==============================
+     REDIRECT IF EMPTY
+  ============================== */
+  useEffect(() => {
+    if (cart.length === 0) {
+      navigate("/cart");
+    }
+  }, [cart, navigate]);
 
-  // 💰 Calculate total
+  /* ==============================
+     TOTAL CALCULATION
+  ============================== */
   const total = cart.reduce(
     (sum, item) => sum + (item.finalPrice || item.price),
     0
   );
 
+  /* ==============================
+     HANDLE PAYMENT (Mock)
+  ============================== */
   const handlePayment = () => {
     setLoading(true);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       navigate("/success");
     }, 2000);
+
+    return () => clearTimeout(timer);
   };
 
   return (
@@ -42,7 +51,7 @@ function Checkout() {
 
       <div className="bg-[#141414] p-8 rounded-2xl max-w-2xl">
 
-        {/* 🧾 List All Games */}
+        {/* ================= ITEM LIST ================= */}
         <div className="space-y-4 mb-8">
           {cart.map((item, index) => (
             <div
@@ -55,18 +64,18 @@ function Checkout() {
           ))}
         </div>
 
-        {/* 💰 Total */}
+        {/* ================= TOTAL ================= */}
         <h2 className="text-2xl mb-8">
           Total: ₹ {total}
         </h2>
 
-        {/* 💳 Payment Button */}
+        {/* ================= PAYMENT BUTTON ================= */}
         <button
           onClick={handlePayment}
           disabled={loading}
-          className={`w-full py-4 rounded-xl text-lg ${
+          className={`w-full py-4 rounded-xl text-lg transition ${
             loading
-              ? "bg-gray-600"
+              ? "bg-gray-600 cursor-not-allowed"
               : "bg-green-600 hover:bg-green-700"
           }`}
         >
@@ -74,7 +83,6 @@ function Checkout() {
         </button>
 
       </div>
-
     </div>
   );
 }

@@ -1,14 +1,21 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import games from "../data/games";
 
-function GameDetail({ addToCart }) {
-
+function GameDetail({ addToCart, addToWishlist }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const game = games.find((g) => g.id === Number(id));
+  /* ==============================
+     FIND GAME (Optimized)
+  ============================== */
+  const game = useMemo(() => {
+    return games.find((g) => g.id === Number(id));
+  }, [id]);
 
+  /* ==============================
+     NOT FOUND HANDLING
+  ============================== */
   if (!game) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white text-2xl">
@@ -17,6 +24,9 @@ function GameDetail({ addToCart }) {
     );
   }
 
+  /* ==============================
+     IMAGE STATE
+  ============================== */
   const [mainImage, setMainImage] = useState(game.image);
 
   return (
@@ -24,7 +34,7 @@ function GameDetail({ addToCart }) {
 
       <div className="grid lg:grid-cols-3 gap-12">
 
-        {/* LEFT SIDE */}
+        {/* ================= LEFT SIDE ================= */}
         <div className="lg:col-span-2">
           <img
             src={mainImage}
@@ -33,7 +43,7 @@ function GameDetail({ addToCart }) {
           />
         </div>
 
-        {/* RIGHT SIDE */}
+        {/* ================= RIGHT SIDE ================= */}
         <div className="bg-[#141414] p-8 rounded-2xl shadow-2xl h-fit">
 
           <h1 className="text-3xl font-bold mb-6">
@@ -44,21 +54,23 @@ function GameDetail({ addToCart }) {
             ₹ {game.price}
           </p>
 
+          {/* Buy Now */}
           <button
             onClick={() =>
               navigate("/checkout", { state: { game } })
             }
-            className="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl mb-4"
+            className="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl mb-4 transition"
           >
             Buy Now
           </button>
 
+          {/* Add to Cart */}
           <button
             onClick={() => {
               addToCart(game);
               navigate("/cart");
             }}
-            className="w-full bg-[#222] hover:bg-[#333] py-3 rounded-xl"
+            className="w-full bg-[#222] hover:bg-[#333] py-3 rounded-xl transition"
           >
             Add To Cart
           </button>
@@ -66,7 +78,6 @@ function GameDetail({ addToCart }) {
         </div>
 
       </div>
-
     </div>
   );
 }
