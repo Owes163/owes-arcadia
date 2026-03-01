@@ -1,5 +1,5 @@
 // Auto import all png images
-const images = import.meta.glob("../assets/*.png", {
+const images = import.meta.glob("../assets/gallery/*.{png,jpg,jpeg}", {
   eager: true,
   import: "default",
 });

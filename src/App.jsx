@@ -25,6 +25,7 @@ import GameDetail from "./pages/GameDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
+import Gallery from "./pages/Gallery";
 
 function App() {
 
@@ -132,6 +133,8 @@ function App() {
 
           {/* ✅ STEP 3 ADDED */}
           <Route path="/success" element={<Success />} />
+          
+          <Route path="/gallery" element={<Gallery />} />
 
         </Routes>
 

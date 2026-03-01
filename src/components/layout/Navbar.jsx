@@ -9,9 +9,7 @@ import { AiOutlineShoppingCart } from "react-icons/ai";
 const navItems = [
   { name: "Home", path: "/" },
   { name: "Games", path: "/games" },
-  { name: "Worlds", path: "/" },
-  { name: "Vault", path: "/" },
-  { name: "Roadmap", path: "/" },
+  { name: "Gallery", path: "/gallery" },
   { name: "About", path: "/" },
 ];
 
