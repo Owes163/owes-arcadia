@@ -100,7 +100,7 @@ const NavBar = ({ cartCount = 0, wishlistCount = 0 }) => {
           to="/"
           className="text-2xl font-bold text-white tracking-wider"
         >
-          OWES ARCADIA
+          Gaming Odyssey
         </Link>
 
         {/* ================= CENTER - NAV LINKS ================= */}
