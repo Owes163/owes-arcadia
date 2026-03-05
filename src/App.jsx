@@ -155,7 +155,7 @@ function App() {
             }
           />
 
-          {/* Wishlist ✅ FIXED */}
+          {/* Wishlist */}
           <Route
             path="/wishlist"
             element={
@@ -167,10 +167,12 @@ function App() {
             }
           />
 
+          {/* Gallery */}
+          <Route path="/gallery" element={<Gallery />} />
+
           {/* Other */}
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/success" element={<Success />} />
-          <Route path="/gallery" element={<Gallery />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
