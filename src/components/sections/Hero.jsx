@@ -143,26 +143,26 @@ const Hero = () => {
           onLoadedData={handleVideoLoad}
         />
 
-        {/* Text Content */}
-        <div className="absolute inset-0 z-40 flex flex-col justify-center px-8 sm:px-16">
-          <h1 className="special-font hero-heading text-white">
-            O<b>W</b>ES
-          </h1>
+         <h1 className="special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75">
+          A<b>R</b>CIDIA
+        </h1>
 
-          <p className="mt-4 max-w-md font-robert-regular text-gray-300">
-            Enter the Metagame Layer <br /> Unleash the Play Economy
-          </p>
+        <div className="absolute left-0 top-0 z-40 size-full">
+          <div className="mt-24 px-5 sm:px-10">
+            <h1 className="special-font hero-heading text-blue-100">
+              O<b>W</b>ES
+            </h1>
 
-          <div className="mt-6">
-            <Button
-              id="watch-trailer"
-              title="Watch trailer"
-              leftIcon={<TiLocationArrow />}
-              containerClass="bg-yellow-400 flex-center gap-2 hover:shadow-[0_0_25px_rgba(255,200,0,0.7)] transition-all duration-300"
-            />
+            <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
+              Enter the Gaming World <br /> Unleash the Play Economy
+            </p>
           </div>
         </div>
       </div>
+
+      <h1 className="special-font hero-heading absolute bottom-5 right-5 text-black">
+        G<b>A</b>MING
+      </h1>
     </div>
   );
 };
